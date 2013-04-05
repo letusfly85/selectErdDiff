@@ -11,6 +11,8 @@ package main.scala.apputils
 import java.util.Properties
 import java.io.{File, FileInputStream}
 
+import Tapper._
+
 class LoadProperties {
 
   def loadProperties :List[Properties] = {
