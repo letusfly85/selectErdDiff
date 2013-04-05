@@ -15,7 +15,7 @@ import Tapper._
 
 class LoadProperties {
 
-  def loadProperties :List[Properties] = {
+  def loadProperties  {
 
     new Properties.tap(_.load(new FileInputStream(new File(path).getAbsolutePath)))
 
