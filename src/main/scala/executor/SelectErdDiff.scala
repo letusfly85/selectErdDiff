@@ -1,5 +1,5 @@
 import main.scala.dummyData.GenerateSampleSets
-import main.scala.entity.{MsTabColumns, MyAttr}
+import main.scala.entity.{MsTabColumns}
 
 /**
  * Created with IntelliJ IDEA.
@@ -18,49 +18,17 @@ object SelectErdDiff {
    *
    * @param args
    */
-  def main(args :Array[String]) {
-
-    val a0 :MyAttr = new MyAttr("userId","number")
-    val a1 :MyAttr = new MyAttr("address", "string")
-    val a2 :MyAttr = new MyAttr("company", "black")
-
-    val b0 :MyAttr = new MyAttr("userId", "number")
-    val b1 :MyAttr = new MyAttr("e-mail", "string")
-    val b2 :MyAttr = new MyAttr("company", "white")
-    val b3 :MyAttr = new MyAttr("position", "associate")
-
-    val circleA :List[MyAttr] = List(a0, a1, a2)
-    val circleB :List[MyAttr] = List(b0, b1, b2, b3)
-
-
-    println("削除対象を表示")
-    val delList = getDeleteList(circleA,circleB)
-    delList.foreach{d: MyAttr =>
-      println("[name]" + d.name + ", [attr]" + d.attr)
-    }
-
-    println("追加対象を表示")
-    val addList = getAddList(circleA, circleB)
-    addList.foreach{a: MyAttr =>
-      println("[name]" + a.name + ", [attr]" + a.attr)
-    }
-
-    println("更新対象を表示")
-    val changes = getChangedList(circleA, circleB)
-    changes.foreach{a: MyAttr =>
-      println("[name]" + a.name + ", [attr]" + a.attr)
-    }
+  def main(args: Array[String]) {
 
     // revision 9141 のレコードセットを取得
     val sample01 = GenerateSampleSets.sample01
-    sample01.foreach{m: MsTabColumns =>
-      println(m.physicalColumnName)
-    }
 
     // revision 9138 のレコードセットを取得
     val sample02 = GenerateSampleSets.sample02
-    sample02.foreach{m: MsTabColumns =>
-      println(m.physicalColumnName)
+
+    // revision 9138 から 9141 への変更で追加になったカラムを表示する
+    getAddList(sample02, sample01).foreach{a :MsTabColumns =>
+      println(a.physicalColumnName)
     }
 
   }
@@ -69,12 +37,12 @@ object SelectErdDiff {
    *
    *
    */
-  def getChangedList(circleA: List[MyAttr], circleB :List[MyAttr]): List[MyAttr] = {
+  def getChangedList(fromRevision: List[MsTabColumns], toRevision :List[MsTabColumns]): List[MsTabColumns] = {
 
-    var changes: List[MyAttr] = List()
-    circleA.foreach{a: MyAttr =>
+    var changes: List[MsTabColumns] = List()
+    fromRevision.foreach{a: MsTabColumns =>
 
-      circleB.foreach{b: MyAttr =>
+      toRevision.foreach{b: MsTabColumns =>
         if (isKeyEq(a,b) && !isValueEq(a,b)) {changes ::= a}
       }
     }
@@ -85,17 +53,17 @@ object SelectErdDiff {
   /**
    * 追加対象を取得する
    *
-   * @param circleA
-   * @param circleB
+   * @param fromRevision
+   * @param toRevision
    * @return
    */
-  def getAddList(circleA: List[MyAttr], circleB: List[MyAttr]): List[MyAttr] = {
+  def getAddList(fromRevision: List[MsTabColumns], toRevision :List[MsTabColumns]): List[MsTabColumns] = {
 
-    var addList: List[MyAttr] = List()
+    var addList: List[MsTabColumns] = List()
     var switch: Boolean = false
-    circleB.foreach{b: MyAttr =>
+    toRevision.foreach{b: MsTabColumns =>
 
-      circleA.foreach{a: MyAttr =>
+      fromRevision.foreach{a: MsTabColumns =>
         if (isKeyEq(b, a)){switch = true}
       }
       if (!switch){
@@ -111,17 +79,17 @@ object SelectErdDiff {
   /**
    * 削除対象を取得する
    *
-   * @param circleA
-   * @param circleB
+   * @param fromRevision
+   * @param toRevision
    * @return
    */
-  def getDeleteList(circleA: List[MyAttr], circleB :List[MyAttr]): List[MyAttr] = {
+  def getDeleteList(fromRevision: List[MsTabColumns], toRevision :List[MsTabColumns]): List[MsTabColumns] = {
 
-    var delList: List[MyAttr] = List()
+    var delList: List[MsTabColumns] = List()
     var switch: Boolean = false
-    circleA.foreach{a: MyAttr =>
+    fromRevision.foreach{a: MsTabColumns =>
 
-      circleB.foreach{b: MyAttr =>
+      toRevision.foreach{b: MsTabColumns =>
         if (isKeyEq(a,b)){switch = true}
       }
       if (!switch){
@@ -137,28 +105,30 @@ object SelectErdDiff {
   /**
    * キー合致確認
    *
-   * @param a
-   * @param b
+   * @param fromRevision
+   * @param toRevision
    * @return
    */
-  def isKeyEq(a: MyAttr, b: MyAttr) :Boolean = {
-    a.name match {
-      case b.name => true
-      case _ => false
+  def isKeyEq(fromRevision: MsTabColumns, toRevision: MsTabColumns) :Boolean = {
+    if (fromRevision.physicalColumnName == toRevision.physicalColumnName) {
+      return true
+    } else {
+      return false
     }
   }
 
   /**
    * バリュー合致確認
    *
-   * @param a
-   * @param b
+   * @param fromRevision
+   * @param toRevision
    * @return
    */
-  def isValueEq(a: MyAttr, b: MyAttr): Boolean = {
-    a.attr match {
-      case b.attr => true
-      case _ => false
+  def isValueEq(fromRevision: MsTabColumns, toRevision :MsTabColumns): Boolean = {
+    if (fromRevision.dataType == toRevision.dataType) {
+      return true
+    } else {
+      return false
     }
   }
 
