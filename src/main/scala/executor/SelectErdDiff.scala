@@ -21,7 +21,7 @@ object SelectErdDiff {
 
     val a0 :MyAttr = new MyAttr("userId","number")
     val a1 :MyAttr = new MyAttr("address", "string")
-    val a2 :MyAttr = new MyAttr("company", "white")
+    val a2 :MyAttr = new MyAttr("company", "black")
 
     val b0 :MyAttr = new MyAttr("userId", "number")
     val b1 :MyAttr = new MyAttr("e-mail", "string")
@@ -44,6 +44,28 @@ object SelectErdDiff {
       println("[name]" + a.name + ", [attr]" + a.attr)
     }
 
+    println("更新対象を表示")
+    val changes = getChangedList(circleA, circleB)
+    changes.foreach{a: MyAttr =>
+      println("[name]" + a.name + ", [attr]" + a.attr)
+    }
+  }
+
+  /**
+   *
+   *
+   */
+  def getChangedList(circleA: List[MyAttr], circleB :List[MyAttr]): List[MyAttr] = {
+
+    var changes: List[MyAttr] = List()
+    circleA.foreach{a: MyAttr =>
+
+      circleB.foreach{b: MyAttr =>
+        if (isKeyEq(a,b) && !isValueEq(a,b)) {changes ::= a}
+      }
+    }
+
+    changes
   }
 
   /**
@@ -120,8 +142,8 @@ object SelectErdDiff {
    * @return
    */
   def isValueEq(a: MyAttr, b: MyAttr): Boolean = {
-    a.name match {
-      case b.name => true
+    a.attr match {
+      case b.attr => true
       case _ => false
     }
   }
