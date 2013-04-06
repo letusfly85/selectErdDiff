@@ -1,4 +1,5 @@
-import main.scala.entity.MyAttr
+import main.scala.dummyData.GenerateSampleSets
+import main.scala.entity.{MsTabColumns, MyAttr}
 
 /**
  * Created with IntelliJ IDEA.
@@ -49,6 +50,19 @@ object SelectErdDiff {
     changes.foreach{a: MyAttr =>
       println("[name]" + a.name + ", [attr]" + a.attr)
     }
+
+    // revision 9141 のレコードセットを取得
+    val sample01 = GenerateSampleSets.sample01
+    sample01.foreach{m: MsTabColumns =>
+      println(m.physicalColumnName)
+    }
+
+    // revision 9138 のレコードセットを取得
+    val sample02 = GenerateSampleSets.sample02
+    sample02.foreach{m: MsTabColumns =>
+      println(m.physicalColumnName)
+    }
+
   }
 
   /**
